@@ -45,10 +45,6 @@ jobs:
       run: |
         pip install jupyter nbconvert
         jupyter nbconvert --to notebook -- execute process_ratings_reviews.ipynb -- output output.ipynb
-    
-    - name: Observe Data output
-      run: |
-        cat output.ipynb
 
     - name: Test with pytest
       run: |
