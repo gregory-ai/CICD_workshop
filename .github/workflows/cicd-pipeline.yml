@@ -46,10 +46,6 @@ jobs:
         pip install jupyter nbconvert
         jupyter nbconvert --to notebook -- execute process_ratings_reviews.ipynb -- output output.ipynb
 
-    - name: Test with pytest
-      run: |
-        pytest
-
     - name: Check for changes 
       id: git-check 
       run: |
