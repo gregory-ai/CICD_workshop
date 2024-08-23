@@ -45,6 +45,7 @@ jobs:
       run: |
         pip install jupyter nbconvert
         jupyter nbconvert --to notebook -- execute process_ratings_reviews.ipynb -- output output.ipynb
+<<<<<<< HEAD
     
     - name: Observe Data output
       run: |
@@ -53,6 +54,8 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+=======
+>>>>>>> cc05f254f70a6c7afc8a414a6c881f62d08ae3ce
 
     - name: Check for changes 
       id: git-check 
@@ -66,4 +69,8 @@ jobs:
       run: |
         git add .
         git commit -m "Refresh data"
+<<<<<<< HEAD
         git push
+=======
+        git push
+>>>>>>> cc05f254f70a6c7afc8a414a6c881f62d08ae3ce
