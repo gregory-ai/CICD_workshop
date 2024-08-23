@@ -1,11 +1,10 @@
 name: cicd-pipeline-workflow 
 on: 
-    push: 
-    workflow_dispatch: 
-    schedule:
+    workflow_dispatch: (manual trigger)
+    schedule: (schedule)
         -cron: 
 jobs: 
-    run-data-pipeline: 
+    run-etl-pipeline: 
         runs-on: ubuntu-latest
         steps: 
             - name: Checkout repo content
@@ -21,6 +20,8 @@ jobs:
               run: pip install -r requirements.txt 
             - name: Run data pipeline
               run: python data_pipeline.py
+            - name: Observe Data output
+              run: ... (add code)
             - name: Check for changes 
               id: git-check 
               run: |
