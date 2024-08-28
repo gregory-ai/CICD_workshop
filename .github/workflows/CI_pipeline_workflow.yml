@@ -89,3 +89,7 @@ jobs:
         git commit -m "Refresh data"
         git push
 
+    # Assign an ID to the build job, this ID can bbe references in CD workflow
+    outputs:
+      job-id: ${{ steps.git-check.id }}
+
