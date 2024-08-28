@@ -1,8 +1,11 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
+# name of workflow 
 name: CI-pipeline-workflow
 
+# event that triggers workflow - push to main branch, 
+# pull request to main branch, and a scheduled cron job 
 on:
   push:
     branches: [ "main" ]
@@ -11,29 +14,43 @@ on:
   schedule: 
     - cron: "0 0 * * *"
 
+# required permissions to read the repository contents 
 permissions:
   contents: read
 
+# defines single job (which is our CI pipeline) 
 jobs:
-  build:
 
+  build:
+    # the job build runs on an Ubuntu OS 
     runs-on: ubuntu-latest
 
+    # define steps ()
     steps:
+    
+    # uses checkout action to fetch the repository contents 
     - name: Checkout repo content
       uses: actions/checkout@v4
 
+    # uses the setup-python action to set up the Python for the job 
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
 
+    # installs the required python dependencies using pip 
+    # uprgades pip, installs flake8, pytest, and pandas
+    # if a requirements.txt file exists in the repository it installs the dependencies
+    #        listed in that file as well
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest pandas
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+        
+    # performs linting using the flake8 tool (linting: checks python syntax errors, 
+    #      undefines names, and enforces certain code style conventions 
     - name: Lint with flake8
       run: |
           # stop the build if there are Python syntax errors or undefined names
@@ -41,15 +58,20 @@ jobs:
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
+    # installs jupyter and nbconvert using pip and execute the Jupyter notebook we created
+    # the output is saved to output.ipynb 
     - name: Run data pipeline
       run: |
         pip install jupyter nbconvert
         jupyter nbconvert --to notebook -- execute process_ratings_reviews.ipynb -- output output.ipynb
 
+    # runs tests using the pytest framework 
     - name: Test with pytest
       run: |
         pytest
 
+    # checks if there are any changes in the repository 
+    # if changes are detected, it sets an environment variable called "changes" to "true"
     - name: Check for changes 
       id: git-check 
       run: |
@@ -57,6 +79,9 @@ jobs:
         git config user.email 'github-actions@github.com'
         git diff  --quiet || echo "changes=true" >> $GITHUB_ENV
 
+    # uses Git commands to add all changes, creates a commit with a message 
+    # and push the changes to the repository 
+    # step is conditional and only runs if "changes" environment variable is set to true 
     - name: Commit and push if changes 
       if: env.changes == 'true'
       run: |
