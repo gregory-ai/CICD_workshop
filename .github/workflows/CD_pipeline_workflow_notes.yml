@@ -17,40 +17,56 @@
 # For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
 
+
+# this GitHub actions workflow automates the process of deploying our previous build of a Python application to an Azure
+# Web App.
 name: Build and deploy Python app to Azure Web App
 
+# sets environment variable for the Azure Web App name and the Python version to use 
 env:
   AZURE_WEBAPP_NAME: your-app-name  # set this to the name of your Azure Web App
   PYTHON_VERSION: '3.10'              # set this to the Python version to use
 
+# event which trigger workflow: completion of workflow named "CI-pipeline-workflow"
 on:
   workflow_run: 
     workflows: ["CI-pipeline-workflow"]
     types: 
       -completed
 
+# set permissions to read the contents of the repository
 permissions:
   contents: read
 
+# defines job named deploy that runs on an Ubuntu environment
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    needs: CI-pipeline-workflow.build.outputs.job-id
+
+    # the job "deploy" depends on the completion of the job named "build" in the CI-pipeline-workflow 
+    needs: CI-pipeline-workflow.build.outputs['job-id']
+    # set the enviornment variable for the deployment, including name and URL of Azure web app 
+    #        aka defining variables that wil be used during the deployment process to identify and target the specific Azure Web App
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
+    # downloads an artifact from the CI-pipeline_workflow job using download-artifact action and saves it in the current directory
+    #        aka download an artifact refers to retrieving files that were produced by a previous job or workflow run 
       - name: Download artifact from CI pipeline
         uses: actions/download-artifact@v3
         with:
           name: python-app
           path: .
-        
+
+    # copies file to a deployment folder 
       - name: Copy output to deployment folder
         run: |
           cp average_ratings_per_sku.csv deployment/
 
+    # deploys contents of the deployment folder to Azure Web App
+    # specifies the app name, the publish profile (stored as a secret), and a package 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
