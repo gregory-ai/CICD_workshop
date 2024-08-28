@@ -63,6 +63,7 @@ jobs:
     # copies file to a deployment folder 
       - name: Copy output to deployment folder
         run: |
+          mkdir -p deployment
           cp average_ratings_per_sku.csv deployment/
 
     # deploys contents of the deployment folder to Azure Web App
